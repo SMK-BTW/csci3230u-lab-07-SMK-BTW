@@ -1,6 +1,7 @@
 import TodoList from "./TodoList.jsx";
+import { useState } from "react";
 // Step 3: create AddTodoForm.jsx, then import and use it below.
-// import AddTodoForm from "./AddTodoForm.jsx";
+import AddTodoForm from "./AddTodoForm.jsx";
 
 const INITIAL_TODOS = [
   { id: 1, text: "Read the lab README", done: true },
@@ -13,7 +14,7 @@ export default function App() {
   //
   // Step 1: hold the todos in state instead of a constant:
   //   const [todos, setTodos] = useState(INITIAL_TODOS)
-  const todos = INITIAL_TODOS;
+  const [todos, setTodos] = useState(INITIAL_TODOS);
 
   // Step 2: write these handlers. They must NOT mutate state - build a NEW
   // array each time (spread / map / filter) and pass it to setTodos:
@@ -22,12 +23,39 @@ export default function App() {
   //   deleteTodo(id)  → drop the matching todo
   // Then pass them as props to the components below.
 
+  function addTodo(text) {
+    const newTodo = {id: Date.now(), text: text, done: false};
+    setTodos([...todos, newTodo]);
+  }
+
+  function toggleTodo(id) {
+    setTodos(todos.map((todo) =>{
+      if (todo.id === id){
+        return {id : todo.id, text: todo.text, done: !todo.done};
+      }
+      return todo;
+    }));
+  }
+
+  function deleteTodo(id) {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  }
+
+  function countDone() {
+    return todos.reduce((count, todo) => count + (todo.done ? 1 : 0), 0);
+  }
+
+
   return (
     <main className="app">
       <h1>My To-Dos</h1>
       {/* Step 3: <AddTodoForm onAdd={addTodo} /> */}
-      <TodoList todos={todos} />
+      <AddTodoForm onAdd={addTodo} />
+      <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />
       {/* Step 4: a derived count - "{done} of {total} done" computed from todos */}
+      <p>
+        {countDone()} of {todos.length} done
+      </p>
     </main>
   );
 }
